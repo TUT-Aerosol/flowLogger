@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#define MAX_PLOT_ITEMS 12*3600
+
 #define flowCurve 0
 #define pressureCurve 1
 #define deltaPCurve 2
@@ -27,6 +29,18 @@ MainWindow::MainWindow(QWidget *parent)
     lblScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     lblScrollArea->setFrameShape(QFrame::NoFrame);
     ui->horizontalLayout_2->addWidget(lblScrollArea);
+
+    // Load and show OQ logo:
+    QGraphicsScene *scene = new QGraphicsScene();
+    QGraphicsSvgItem *svgItem = new QGraphicsSvgItem(":/images/OQlogo.svg");
+    svgItem->setScale(0.8);
+    scene->addItem(svgItem);
+    ui->graphicsView->setStyleSheet("background: transparent");
+    ui->graphicsView->fitInView(svgItem->boundingRect(),Qt::KeepAspectRatio);
+    qDebug() << "Bounding rect: " << svgItem->boundingRect();
+    ui->graphicsView->setScene(scene);
+    //ui->graphicsView->fitInView(svgItem->boundingRect(),Qt::KeepAspectRatio);
+    ui->graphicsView->show();
 
     Log("Program started.");
 
@@ -124,6 +138,13 @@ void MainWindow::handleData(QString receivedData) {
         //ui->RowsSavedTxt->setText(QString("Rows saved: %1").arg(rowsSaved));
     }
 
+    // Check if we exceed the Plot limit:
+    if(numDataPoints > MAX_PLOT_ITEMS) {
+        for(int i=0; i<Plot->getNumCurves() + 1; i++)
+            Plot->RemoveFirstPoint(i);
+    }
+
+    // Add the new datapoints to plot:
     Plot->AddPoint(flowCurve,currentTime,currentData.at(0));
     Plot->AddPoint(4+flowCurve,currentTime,currentData.at(0));
 
@@ -135,6 +156,8 @@ void MainWindow::handleData(QString receivedData) {
 
     Plot->AddPoint(tempCurve,currentTime,currentData.at(3));
     Plot->AddPoint(4+tempCurve,currentTime,currentData.at(3));
+
+    numDataPoints ++;
 
     serialTimer->start(); // Start the timeout again.
 }
@@ -309,14 +332,14 @@ void MainWindow::startSaving() {
         rowsSaved = 0;
         ui->saveLabel->setText("NOT saving!");
         // Stop saving log:
-        /*if(isLogSaving) {
+        if(isLogSaving) {
             isLogSaving = false;
             logOut.flush();
             logSaveFile->flush();
             logSaveFile->close();
             ui->actionSave_log_as->setEnabled(false);
             ui->actionSave_log_as->setText("Save log as...");
-        }*/
+        }
         return;
     }
 
@@ -373,7 +396,7 @@ void MainWindow::startSaving() {
 
         isSaving = true;
         ui->actionSave_as->setText(tr("Stop saving"));
-        //ui->actionSave_log_as->setEnabled(true);
+        ui->actionSave_log_as->setEnabled(true);
         Log("Data saving started.");
 
         periodicSavingOn = false;
@@ -577,5 +600,76 @@ void MainWindow::on_actionSave_as_triggered()
 void MainWindow::on_actionRefresh_ports_triggered()
 {
     refreshSerialPorts();
+}
+
+
+void MainWindow::on_actionAbout_triggered()
+{
+    aboutWindow *aboutwindow = new aboutWindow(this);
+    aboutwindow->setWindowFlags(Qt::Window);
+    aboutwindow->show();
+}
+
+
+void MainWindow::on_actionQuick_guide_triggered()
+{
+    quickguidewindow *guideWindow = new quickguidewindow(this);
+    guideWindow->setWindowFlags(Qt::Window);
+    guideWindow->show();
+}
+
+
+void MainWindow::on_actionShow_log_triggered()
+{
+    logwindow *logWindow = new logwindow(this);
+    logWindow->refreshTextBox(&allLogs);
+    logWindow->setWindowFlags(Qt::Window);
+    logWindow->show();
+    connect(this,SIGNAL(logTextAdded(QString)),logWindow,SLOT(addLogText(QString)));
+}
+
+
+void MainWindow::on_actionSave_log_as_triggered()
+{
+    if(isLogSaving) {
+        isLogSaving = false;
+        logOut.flush();
+        logSaveFile->flush();
+        logSaveFile->close();
+        ui->actionSave_log_as->setText("Save log as...");
+        return;
+    }
+    QFileInfo currentFileInfo = QFileInfo(*saveFile);
+    QString defaultLogFilename = currentFileInfo.baseName() + ".log";
+    QString defaultDirectory = currentFileInfo.absolutePath();
+
+    OQFileDialog *fileDialog = new OQFileDialog(this, "Save log as...",{"Log file (*.log)","All files (*)"},defaultLogFilename,false);
+    fileDialog->setAcceptMode(QFileDialog::AcceptSave);
+    fileDialog->setDirectory(defaultDirectory);
+    fileDialog->setFileMode(QFileDialog::AnyFile);
+    if(!fileDialog->exec()) {
+        return;
+    }
+
+    QString selectedFile = fileDialog->selectedFiles().first();
+    if(!selectedFile.isEmpty()) {
+        logSaveFile = new QFile(selectedFile);
+
+        if(!logSaveFile->open(QIODevice::WriteOnly)) {
+            QMessageBox::information(this, tr("Unable to open file"),logSaveFile->errorString());
+            return;
+        }
+        logOut.setDevice(logSaveFile);
+
+        // Write all logs that already exist:
+        for(int i=0; i < allLogs.length(); i++) {
+            logOut << allLogs.at(i) << "\r\n";
+        }
+
+        logOut.flush();
+        logSaveFile->flush();
+        isLogSaving = true;
+        ui->actionSave_log_as->setText("Stop saving log");
+    }
 }
 

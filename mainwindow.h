@@ -18,6 +18,10 @@
 #include "oqserialport.h"
 #include "oqplot.h"
 #include "oqfiledialog.h"
+#include "aboutwindow.h"
+#include "quickguidewindow.h"
+#include "logwindow.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -55,6 +59,7 @@ public:
     bool newRowStarted = true;
 
     qint32 rowsSaved = 0;
+    qint32 numDataPoints = 0;
     qint64 savingPeriod;
     qint64 saveFileNumber;
 
@@ -104,6 +109,14 @@ private slots:
     void on_actionSave_as_triggered();
 
     void on_actionRefresh_ports_triggered();
+
+    void on_actionAbout_triggered();
+
+    void on_actionQuick_guide_triggered();
+
+    void on_actionShow_log_triggered();
+
+    void on_actionSave_log_as_triggered();
 
 private:
     Ui::MainWindow *ui;

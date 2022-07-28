@@ -154,21 +154,6 @@ void OQPlot::zoomToRect(const QRectF &rect, int direction)
         emit zoomedIn(true);
     }
     else if(rect.topLeft() != rect.bottomRight()) {
-        double stepSize = this->Plot->axisStepSize(QwtPlot::yLeft);
-        int maxMajor = this->Plot->axisMaxMajor(QwtPlot::yLeft);
-        double intMin = this->Plot->axisInterval(QwtPlot::yLeft).minValue();
-        double intMax = this->Plot->axisInterval(QwtPlot::yLeft).maxValue();
-        QwtPlotItemList itmList = this->Plot->itemList();
-        QwtPlotItem* it = itmList.at(0);
-        QRectF rect = it->boundingRect();
-        double rTop = rect.top();
-        double rBot = rect.bottom();
-        /*qDebug() << "Rect top: " << rTop;
-        qDebug() << "rBot: " << rBot;
-        qDebug() << "stepSize: " << stepSize;
-        qDebug() << "maxMajor: " << maxMajor;
-        qDebug() << "intMin: " << intMin;
-        qDebug() << "intMax: " << intMax;*/
         Plot->setAxisAutoScale(QwtPlot::xBottom,true);
         Plot->setAxisAutoScale(QwtPlot::yLeft,true);
         if(Plot->axisEnabled(QwtPlot::yRight)) {
@@ -276,4 +261,8 @@ void OQPlot::setUnit(quint8 Curve, QString unitStr) {
 
  int OQPlot::getCurveLength(qint8 Curve) {
      return Curves[Curve].xData.length();
+ }
+
+ qint8 OQPlot::getNumCurves() {
+     return CurveCount;
  }

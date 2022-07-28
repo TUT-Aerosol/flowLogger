@@ -51,6 +51,8 @@ public:
 
     bool HideCurve(qint8 curveId);
     bool ShowCurve(qint8 curveId);
+
+    qint8 getNumCurves();
 public slots:
     void zoomToRect(const QRectF &rect, int direction);
     void pannedSlot(int dx, int dy);
