@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>992</width>
+    <height>591</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QwtPlot" name="qwtPlot"/>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <item alignment="Qt::AlignLeft|Qt::AlignTop">
+           <widget class="QGroupBox" name="groupBox">
+            <property name="title">
+             <string>Left Y</string>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <item>
+              <widget class="QSplitter" name="splitter">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <widget class="QRadioButton" name="rbNoneLeft">
+                <property name="text">
+                 <string>None</string>
+                </property>
+               </widget>
+               <widget class="QRadioButton" name="rbFlowLeft">
+                <property name="text">
+                 <string>Flow</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+               <widget class="QRadioButton" name="rbPressureLeft">
+                <property name="text">
+                 <string>Pressure</string>
+                </property>
+               </widget>
+               <widget class="QRadioButton" name="rbDpLeft">
+                <property name="text">
+                 <string>deltaP</string>
+                </property>
+               </widget>
+               <widget class="QRadioButton" name="rbTempLeft">
+                <property name="text">
+                 <string>Temperature</string>
+                </property>
+               </widget>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item alignment="Qt::AlignLeft|Qt::AlignTop">
+           <widget class="QGroupBox" name="groupBox_2">
+            <property name="title">
+             <string>Right Y</string>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_4">
+             <item>
+              <widget class="QSplitter" name="splitter_2">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <widget class="QRadioButton" name="rbNoneRight">
+                <property name="text">
+                 <string>None</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+               <widget class="QRadioButton" name="rbFlowRight">
+                <property name="text">
+                 <string>Flow</string>
+                </property>
+                <property name="checked">
+                 <bool>false</bool>
+                </property>
+               </widget>
+               <widget class="QRadioButton" name="rbPressureRight">
+                <property name="text">
+                 <string>Pressure</string>
+                </property>
+               </widget>
+               <widget class="QRadioButton" name="rbDpRight">
+                <property name="text">
+                 <string>deltaP</string>
+                </property>
+               </widget>
+               <widget class="QRadioButton" name="rbTempRight">
+                <property name="text">
+                 <string>Temperature</string>
+                </property>
+               </widget>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item alignment="Qt::AlignHCenter|Qt::AlignTop">
+         <widget class="QLabel" name="saveLabel">
+          <property name="text">
+           <string>NOT saving!</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>992</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionSave_as"/>
+   </widget>
+   <widget class="QMenu" name="menuSettings">
+    <property name="title">
+     <string>Settings</string>
+    </property>
+    <widget class="QMenu" name="menuSelect_port">
+     <property name="title">
+      <string>Select port</string>
+     </property>
+    </widget>
+    <addaction name="menuSelect_port"/>
+    <addaction name="actionDisconnect"/>
+    <addaction name="actionRefresh_ports"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuSettings"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionDisconnect">
+   <property name="text">
+    <string>Disconnect</string>
+   </property>
+  </action>
+  <action name="actionRefresh_ports">
+   <property name="text">
+    <string>Refresh ports</string>
+   </property>
+  </action>
+  <action name="actionNone">
+   <property name="text">
+    <string>None</string>
+   </property>
+  </action>
+  <action name="actionSave_as">
+   <property name="text">
+    <string>Save as...</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QwtPlot</class>
+   <extends>QFrame</extends>
+   <header>qwt_plot.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
