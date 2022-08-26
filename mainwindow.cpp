@@ -140,7 +140,7 @@ void MainWindow::handleData(QString receivedData) {
 
     // Check if we exceed the Plot limit:
     if(numDataPoints > MAX_PLOT_ITEMS) {
-        for(int i=0; i<Plot->getNumCurves() + 1; i++)
+        for(int i=0; i<Plot->getNumCurves(); i++)
             Plot->RemoveFirstPoint(i);
     }
 
@@ -376,7 +376,7 @@ void MainWindow::startSaving() {
         return;
     }
 
-    QString selectedFile = fileDialog->selectedFiles().first();
+    QString selectedFile = fileDialog->selectedFiles().at(0);
 
     if(!selectedFile.isEmpty()) {
         QFileInfo fi(selectedFile);
