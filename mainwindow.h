@@ -14,6 +14,7 @@
 #include <QSettings>
 #include <QDir>
 #include <QStandardPaths>
+#include <QTextStream>
 
 #include "oqserialport.h"
 #include "oqplot.h"
@@ -117,6 +118,8 @@ private slots:
     void on_actionShow_log_triggered();
 
     void on_actionSave_log_as_triggered();
+
+    void on_rbVolFlowLeft_clicked();
 
 private:
     Ui::MainWindow *ui;

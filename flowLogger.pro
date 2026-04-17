@@ -1,6 +1,7 @@
 QT       += core gui
 QT += serialport
-QT += svgwidgets
+
+greaterThan(QT_MAJOR_VERSION, 5): QT += svgwidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -9,14 +10,20 @@ CONFIG += qwt
 
 DEFINES += QWT_DLL
 
-VERSION = 0.9.0
+VERSION = 0.9.2
 DEFINES += PROGRAM_VERSION=\\\"$$VERSION\\\"
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-include ( C:/Users/simonenp/Documents/QtProjects/Qwt-6.2.0/features/qwt.prf )
+contains(QT_ARCH, i386) {
+    include ( C:/Users/simonenp/Documents/QtProjects/Qwt-6.2.0-32/features/qwt.prf)
+}
+else {
+    include ( C:/Users/simonenp/Documents/QtProjects/Qwt-6.2.0/features/qwt.prf )
+}
+
 
 SOURCES += \
     aboutwindow.cpp \

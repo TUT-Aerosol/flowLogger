@@ -1,12 +1,18 @@
 #include "mainwindow.h"
+#include "qdebug.h"
 #include "ui_mainwindow.h"
 
 #define MAX_PLOT_ITEMS 12*3600
 
+#define numLeftCurves 5
+#define numRightCurves 5
+
 #define flowCurve 0
-#define pressureCurve 1
-#define deltaPCurve 2
-#define tempCurve 3
+#define flowVolCurve 1
+#define pressureCurve 2
+#define deltaPCurve 3
+#define tempCurve 4
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -53,17 +59,19 @@ MainWindow::MainWindow(QWidget *parent)
     QColor Colors[8] = {Qt::blue, Qt::red, Qt::green, Qt::cyan, Qt::magenta, Qt::darkCyan, Qt::gray, Qt::darkBlue};
     Plot->AddCurve("Flow", "slpm", Colors[0],QwtPlot::yLeft,1);
     // The following ones are just placeholders for other possible left Y-axis curves:
+    Plot->AddCurve("Vol flow", "lpm", Colors[0], QwtPlot::yLeft,1);
     Plot->AddCurve("Pressure","kPa",Colors[0],QwtPlot::yLeft,1);
     Plot->AddCurve("deltaP","Pa",Colors[0],QwtPlot::yLeft,1);
     Plot->AddCurve("Temperature","°C",Colors[0],QwtPlot::yLeft,1);
     // The following ones are just placeholders for possible right Y-axis curves:
     Plot->AddCurve("Flow", "slpm", Colors[1], QwtPlot::yRight,1);
+    Plot->AddCurve("Vol flow", "lpm", Colors[0], QwtPlot::yRight,1);
     Plot->AddCurve("Pressure","kPa",Colors[1], QwtPlot::yRight,1);
     Plot->AddCurve("deltaP","Pa",Colors[1], QwtPlot::yRight,1);
     Plot->AddCurve("Temperature","°C",Colors[1], QwtPlot::yRight,1);
 
     // Hide all curves except the first one:
-    for(int i=1; i < 8; i++)
+    for(int i=1; i < numLeftCurves+numRightCurves; i++)
         Plot->HideCurve(i);
 
     // Check available serial ports:
@@ -146,16 +154,19 @@ void MainWindow::handleData(QString receivedData) {
 
     // Add the new datapoints to plot:
     Plot->AddPoint(flowCurve,currentTime,currentData.at(0));
-    Plot->AddPoint(4+flowCurve,currentTime,currentData.at(0));
+    Plot->AddPoint(numLeftCurves+flowCurve,currentTime,currentData.at(0));
 
     Plot->AddPoint(pressureCurve,currentTime,currentData.at(2));
-    Plot->AddPoint(4+pressureCurve,currentTime,currentData.at(2));
+    Plot->AddPoint(numLeftCurves+pressureCurve,currentTime,currentData.at(2));
 
     Plot->AddPoint(deltaPCurve,currentTime,currentData.at(1));
-    Plot->AddPoint(4+deltaPCurve,currentTime,currentData.at(1));
+    Plot->AddPoint(numLeftCurves+deltaPCurve,currentTime,currentData.at(1));
 
     Plot->AddPoint(tempCurve,currentTime,currentData.at(3));
-    Plot->AddPoint(4+tempCurve,currentTime,currentData.at(3));
+    Plot->AddPoint(numLeftCurves+tempCurve,currentTime,currentData.at(3));
+
+    double volFlow = currentData.at(0)* (273.15+currentData.at(3))/(273.15 + 21.11)*101.3/currentData.at(2);
+    Plot->AddPoint(flowVolCurve, currentTime, volFlow);
 
     numDataPoints ++;
 
@@ -205,6 +216,7 @@ void MainWindow::connectToPort(QString portName, int index) {
             actionsList.at(i)->setText(portName + " (active)");
         }
     }
+    startSaving();
 }
 
 void MainWindow::handlePortOpening(bool isOpen) {
@@ -292,6 +304,11 @@ void MainWindow::noCommunication() {
         }
     }
     QMessageBox::information(this, tr("COM port error"),"No response from the COM port. Disconnecting.");
+
+    if(isSaving) {
+        // If saving is on, stop saving by calling startSaving()...
+        startSaving();
+    }
 }
 
 void MainWindow::Log(QString msg) {
@@ -496,7 +513,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_rbNoneLeft_clicked()
 {
-    for(int i=0; i < 4; i++) {
+    for(int i=0; i < numLeftCurves; i++) {
         Plot->HideCurve(i);
     }
 }
@@ -506,7 +523,7 @@ void MainWindow::on_rbNoneLeft_clicked()
 
 void MainWindow::on_rbFlowLeft_clicked()
 {
-    for(int i=0; i < 4; i++) {
+    for(int i=0; i < numLeftCurves; i++) {
         Plot->HideCurve(i);
     }
     Plot->ShowCurve(flowCurve);
@@ -515,7 +532,7 @@ void MainWindow::on_rbFlowLeft_clicked()
 
 void MainWindow::on_rbPressureLeft_clicked()
 {
-    for(int i=0; i < 4; i++) {
+    for(int i=0; i < numLeftCurves; i++) {
         Plot->HideCurve(i);
     }
     Plot->ShowCurve(pressureCurve);
@@ -524,7 +541,7 @@ void MainWindow::on_rbPressureLeft_clicked()
 
 void MainWindow::on_rbDpLeft_clicked()
 {
-    for(int i=0; i < 4; i++) {
+    for(int i=0; i < numLeftCurves; i++) {
         Plot->HideCurve(i);
     }
     Plot->ShowCurve(deltaPCurve);
@@ -533,16 +550,23 @@ void MainWindow::on_rbDpLeft_clicked()
 
 void MainWindow::on_rbTempLeft_clicked()
 {
-    for(int i=0; i < 4; i++) {
+    for(int i=0; i < numLeftCurves; i++) {
         Plot->HideCurve(i);
     }
     Plot->ShowCurve(tempCurve);
 }
 
+void MainWindow::on_rbVolFlowLeft_clicked()
+{
+    for(int i=0; i < numLeftCurves; i++) {
+        Plot->HideCurve(i);
+    }
+    Plot->ShowCurve(flowVolCurve);
+}
 
 void MainWindow::on_rbNoneRight_clicked()
 {
-    for(int i=4; i < 8; i++) {
+    for(int i=numLeftCurves; i < numLeftCurves+numRightCurves; i++) {
         Plot->HideCurve(i);
     }
 }
@@ -550,38 +574,38 @@ void MainWindow::on_rbNoneRight_clicked()
 
 void MainWindow::on_rbFlowRight_clicked()
 {
-    for(int i=4; i < 8; i++) {
+    for(int i=numLeftCurves; i < numLeftCurves+numRightCurves; i++) {
         Plot->HideCurve(i);
     }
-    Plot->ShowCurve(4+flowCurve);
+    Plot->ShowCurve(numLeftCurves+flowCurve);
 }
 
 
 void MainWindow::on_rbPressureRight_clicked()
 {
-    for(int i=4; i < 8; i++) {
+    for(int i=numLeftCurves; i < numLeftCurves+numRightCurves; i++) {
         Plot->HideCurve(i);
     }
-    Plot->ShowCurve(4+pressureCurve);
+    Plot->ShowCurve(numLeftCurves+pressureCurve);
 }
 
 
 
 void MainWindow::on_rbDpRight_clicked()
 {
-    for(int i=4; i < 8; i++) {
+    for(int i=numLeftCurves; i < numLeftCurves+numRightCurves; i++) {
         Plot->HideCurve(i);
     }
-    Plot->ShowCurve(4+deltaPCurve);
+    Plot->ShowCurve(numLeftCurves+deltaPCurve);
 }
 
 
 void MainWindow::on_rbTempRight_clicked()
 {
-    for(int i=4; i < 8; i++) {
+    for(int i=numLeftCurves; i <  numLeftCurves+numRightCurves; i++) {
         Plot->HideCurve(i);
     }
-    Plot->ShowCurve(4+tempCurve);
+    Plot->ShowCurve(numLeftCurves+tempCurve);
 }
 
 
@@ -672,4 +696,7 @@ void MainWindow::on_actionSave_log_as_triggered()
         ui->actionSave_log_as->setText("Stop saving log");
     }
 }
+
+
+
 

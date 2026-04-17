@@ -105,10 +105,15 @@
                </widget>
                <widget class="QRadioButton" name="rbFlowLeft">
                 <property name="text">
-                 <string>Flow</string>
+                 <string>Mass flow</string>
                 </property>
                 <property name="checked">
                  <bool>true</bool>
+                </property>
+               </widget>
+               <widget class="QRadioButton" name="rbVolFlowLeft">
+                <property name="text">
+                 <string>Vol flow</string>
                 </property>
                </widget>
                <widget class="QRadioButton" name="rbPressureLeft">
@@ -161,7 +166,7 @@
                </widget>
                <widget class="QRadioButton" name="rbFlowRight">
                 <property name="text">
-                 <string>Flow</string>
+                 <string>Mass flow</string>
                 </property>
                 <property name="checked">
                  <bool>false</bool>
